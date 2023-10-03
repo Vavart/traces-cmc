@@ -1,0 +1,15 @@
+{
+  "name": "indicators",
+  "version": "1.0.0",
+  "description": "Les indicateurs pour le TP",
+  "main": "mapping.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "sqlite3": "^5.1.6"
+  }
+}
