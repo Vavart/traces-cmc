@@ -31,7 +31,6 @@ dataArr.forEach(query => {
   }
 });
 
-
 // Close the DB connection
 db.close(err => {
   if (err) {

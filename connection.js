@@ -8,9 +8,10 @@ const mysql = require('mysql');
 
 // Connection to the database
 const con = mysql.createConnection({
-  host: "",
-  user: "root",
-  database: "analysedata",
+  host: "e-srv-lamp.univ-lemans.fr",
+  user: "",
+  database: "",
+  password: "",
 });
 
 con.connect(function(err) {
