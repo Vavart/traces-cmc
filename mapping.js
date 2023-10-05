@@ -15,14 +15,78 @@ const connection = mysql.createConnection({
 });
 
 
+class User{
+  constructor(name){
+    this.name = name
+    this.connections = []
+    this.displays = []
+    this.posts = []
+    this.activities = []
+  }
+}
+
+class Connection{
+  constructor(date, time, delay, comment){
+    this.date = date
+    this.heure = time
+    this.delai = delay
+    this.comment = comment
+  }
+}
+
+class Display{
+  constructor(type, idForum, date, time, delay, comment){
+    this.type = type
+    this.idForum = idForum
+    this.date = date
+    this.heure = time
+    this.delai = delay
+    this.comment = comment
+  }
+}
+
+class Posts{
+  constructor(type, idForum, date, time, delay, comment){
+    this.type = type
+    this.idForum = idForum
+    this.date = date
+    this.heure = time
+    this.delai = delay
+    this.comment = comment
+  }
+}
+
+class Activity { 
+  constructor(type, date, time){
+    this.type = type
+    this.date = date
+    this.heure = time
+  }
+}
+
+
+function createUsers(users){
+  let usersList = []
+  users.forEach(user => {
+    usersList.push(new User(user))
+  });
+  return usersList
+}
+
+
 // Function to process the data from the database
 function processData(data, users) {
-  jsonFile = []
+
+  usersList = createUsers(users);
 
   data.forEach(row => {
       
+    userIndex = users.indexOf(row.Utilisateur)
+
     switch (row.Titre){
       case 'Connexion':
+        
+        usersList[userIndex].connections.push(new Connection(row.Date, row.Heure, row.Delai, row.Commentaire))
         // ajouter au user i les données de cette connexion
         // date, heure, delai, comm
         break
@@ -47,8 +111,13 @@ function processData(data, users) {
         // type, date, heure
         break
     }
+
+    
       
   });
+
+  console.log(JSON.stringify(usersList));
+
 
 }
 
@@ -70,7 +139,7 @@ function exportData() {
 
   connection.query(tableQuery, (err, rows, fields) => {
     if (err) throw err;
-    processData(rows);
+    processData(rows, users);
   });
 
   connection.end(); 
