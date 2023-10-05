@@ -16,10 +16,38 @@ const connection = mysql.createConnection({
 
 
 // Function to process the data from the database
-function processData(data) {
+function processData(data, users) {
+  jsonFile = []
 
   data.forEach(row => {
-    
+      
+    switch (row.Titre){
+      case 'Connexion':
+        // ajouter au user i les données de cette connexion
+        // date, heure, delai, comm
+        break
+      case 'Afficher une structure du cours':
+      case 'Afficher une structure (cours/forum)':
+      case 'Afficher le fil de discussion':
+      case 'Afficher le contenu d\'un message':
+        // ajouter au user i les données de cet affichage
+        // type, idForum, date, heure, delai, comm
+        break
+      case 'Répondre à un sondage':
+      case 'Poster un nouveau message':
+      case 'Citer un message':
+        // ajouter au user i les données de cette réponse
+        // type, idForum, date, heure, delai, comm
+        break
+      case 'Bouger la scrollbar en bas - afficher la fin du message':
+      case 'Bouger la scrollbar en bas':
+      case 'Upload un fichier avec le message':
+      case 'Download un fichier avec le message':
+        // ajouter au user i les données de cette activité
+        // type, date, heure
+        break
+    }
+      
   });
 
 }
@@ -29,9 +57,18 @@ function processData(data) {
 function exportData() {
 
   connection.connect();
-  const query = "SELECT * FROM transition";
+  const userQuery = "SELECT DISTINCT Utilisateur FROM transition";
+  const tableQuery = "SELECT * FROM transition";
+  const users = [];
 
-  connection.query(query, (err, rows, fields) => {
+  connection.query(userQuery, (err, rows, fields) => {
+    if (err) throw err;
+    rows.forEach(row => {
+      users.push(row.Utilisateur);
+    });
+  })
+
+  connection.query(tableQuery, (err, rows, fields) => {
     if (err) throw err;
     processData(rows);
   });
