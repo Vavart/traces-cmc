@@ -1,40 +1,43 @@
-// Require or import the dependencies
-const fs = require("fs");
-const sqlite3 = require("sqlite3").verbose();
+// File : mapping.js
+// Author: Clara D. & Maxime S.
+// Description: This file is used to export the data from the database to a JSON file
 
-// Read the SQL file
-const dataSql = fs.readFileSync("./traceforum.sql").toString();
+// Dependencies
+const mysql = require('mysql');
+require('dotenv').config();
 
-// Setup the database connection
-let db = new sqlite3.Database("indicators.db", err => {
-  if (err) {
-    return console.error(err.message);
-  }
-  console.log("Connected to the in-memory SQLite database.");
+// Connection to the database (using .env file)
+const connection = mysql.createConnection({
+  host: process.env.HOST,
+  user: process.env.USER,
+  database: process.env.DATABASE,
+  password: process.env.PASSWORD,
 });
 
-// Convert the SQL string to array so that you can run them one at a time.
-// You can split the strings using the query delimiter i.e. `;` in // my case I used `);` because some data in the queries had `;`.
-// const dataArr = dataSql.toString().split(");");
-// console.log(dataSql.toString().split(");")[0]);
-const dataArr = dataSql.toString().split(");");
 
-// Loop through the `dataArr` and db.run each query
-dataArr.forEach(query => {
-  if (query) {
-    // Add the delimiter back to each query before you run them
-    // In my case the it was `);`
-    query += ");";
-    db.run(query, err => {
-      if (err) throw err;
-    });
-  }
-});
+// Function to process the data from the database
+function processData(data) {
 
-// Close the DB connection
-db.close(err => {
-  if (err) {
-    return console.error(err.message);
-  }
-  console.log("Closed the database connection.");
-});
+  data.forEach(row => {
+    
+  });
+
+}
+
+
+// Exporting the data from the database to a JSON file
+function exportData() {
+
+  connection.connect();
+  const query = "SELECT * FROM transition";
+
+  connection.query(query, (err, rows, fields) => {
+    if (err) throw err;
+    processData(rows);
+  });
+
+  connection.end(); 
+
+}
+
+exportData();
