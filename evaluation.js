@@ -95,6 +95,7 @@ function countActions(data, usersActions) {
     return usersActions;
 }
 
+// Get the minimum and maximum of a data
 function getMinAndMaxOfData(usersMeasures, title) {
   let min = usersMeasures[0][title];
   let max = usersMeasures[0][title];
@@ -111,6 +112,7 @@ function getMinAndMaxOfData(usersMeasures, title) {
   return [min, max];
 }
 
+// Get the minimum and maximum of all the data (connections, displays, posts, activities)
 function getMinAndMaxOfAllData(usersMeasures) {
   const measures = new Measures();
   TITLES.forEach(title => {
@@ -122,7 +124,7 @@ function getMinAndMaxOfAllData(usersMeasures) {
   return measures;
 }
 
-
+// Evaluate the score of each user per action (connections, displays, posts, activities)
 function evaluateScore(usersMeasures, measures) {
   usersMeasures.forEach(user => {
     TITLES.forEach(title => {
@@ -133,7 +135,7 @@ function evaluateScore(usersMeasures, measures) {
   return usersMeasures;
 }
 
-
+// Evaluate the total score of each user
 function evaluateTotalScore(usersScores) {
   usersScores.forEach(user => {
     user.score = 0;
@@ -145,6 +147,7 @@ function evaluateTotalScore(usersScores) {
   return usersScores;
 }
 
+// Get the minimum and maximum score of a user
 function getMinAndMaxScoreOfUser(usersTotalScores) {
   let min = usersTotalScores[0].score;
   let max = usersTotalScores[0].score;
@@ -161,6 +164,7 @@ function getMinAndMaxScoreOfUser(usersTotalScores) {
   return [min, max];
 }
 
+// Normalize the score of each user according to the minimum and maximum score (previous function)
 function normalizeScore(usersTotalScores, scoreMin, scoreMax) {
   usersTotalScores.forEach(user => {
     user.normalizedscore = (user.score - scoreMin) / (scoreMax - scoreMin);
@@ -169,6 +173,7 @@ function normalizeScore(usersTotalScores, scoreMin, scoreMax) {
   return usersTotalScores;
 }
 
+// Get all the scores of each user (normalized score, apart from the others attributes of the user)
 function getAllScores(usersNormalizedScores) {
   let scores = [];
   usersNormalizedScores.forEach(user => {
@@ -187,9 +192,11 @@ const usersActions = createUsersActions(usersList);
 const usersMeasures = countActions(data, usersActions);
 const measures = getMinAndMaxOfAllData(usersMeasures);
 const usersScores = evaluateScore(usersMeasures, measures);
+console.log(usersScores[0]);
+console.log(measures);
 const usersTotalScores = evaluateTotalScore(usersScores);
 const [scoreMin, scoreMax] = getMinAndMaxScoreOfUser(usersTotalScores);
 const usersNormalizedScores = normalizeScore(usersTotalScores, scoreMin, scoreMax);
 const scores = getAllScores(usersNormalizedScores);
-console.log(scores);
-console.log(usersActions[usersList.indexOf("madeth")]); // mauvais un peu
+// console.log(scores);
+// console.log(usersActions[usersList.indexOf("madeth")]); // mauvais un peu

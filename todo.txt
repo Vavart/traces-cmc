@@ -4,5 +4,5 @@
 - interface
 
 nice to have : 
-- décomposer en fichiers séparés (genre un dossier models etc...)
+- décomposer en fichiers séparés (genre un dossier models, scripts etc...)
 - mettre les variables globales dans un fichier séparé (genre un fichier config.js)
