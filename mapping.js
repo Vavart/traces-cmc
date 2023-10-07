@@ -2,8 +2,9 @@
 // Author: Clara D. & Maxime S.
 // Description: This file is used to export the data from the database to a JSON file
 
-// Dependencies
+// Dependencies (npm install)
 const mysql = require('mysql');
+const fs = require('fs');
 require('dotenv').config();
 
 // Connection to the database (using .env file)
@@ -13,6 +14,9 @@ const connection = mysql.createConnection({
   database: process.env.DATABASE,
   password: process.env.PASSWORD,
 });
+
+// Global variables
+const FILEPATH = './data/data.json';
 
 
 class User{
@@ -62,6 +66,14 @@ class Activity {
     this.date = date
     this.heure = time
   }
+}
+
+
+function createJsonFile(jsonFile){
+  fs.writeFile(FILEPATH, jsonFile, (err) => {
+    if (err) throw err;
+    console.log('File has been saved !');
+  });
 }
 
 
@@ -122,9 +134,8 @@ function processData(data, users) {
       
   });
 
-  console.log(JSON.stringify(usersList));
-
-
+  jsonFile = JSON.stringify(usersList);
+  createJsonFile(jsonFile);
 }
 
 
@@ -152,4 +163,6 @@ function exportData() {
 
 }
 
+
+// Calling the function
 exportData();

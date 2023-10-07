@@ -1,0 +1,8 @@
+
+
+- evaluation
+- interface
+
+nice to have : 
+- décomposer en fichiers séparés (genre un dossier models etc...)
+- mettre les variables globales dans un fichier séparé (genre un fichier config.js)
