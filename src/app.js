@@ -45,3 +45,15 @@ new Chart(ctx, {
     }
   }
 });
+
+
+function getSomething() {
+  fetch("/data/data.json")
+    .then (response => response.json())
+    .then (data => {
+      console.log(data);
+    })
+}
+
+const btn = document.getElementById("btn");
+btn.addEventListener("click", getSomething);

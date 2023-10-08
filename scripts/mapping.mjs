@@ -1,34 +1,11 @@
-// File : mapping.js
+// File: mapping.mjs
 // Author: Clara D. & Maxime S.
 // Description: This file is used to export the data from the database to a JSON file
 
-// Dependencies (npm install)
-import mysql from 'mysql';
-import fs from 'fs';
-import { config } from 'dotenv';
+// Dependencies
 import { User, Connection, Display, Posts, Activity } from './classes.mjs';
-
-config();
-console.log("Hello from mapping.js");
-
-// Connection to the database (using .env file)
-const connection = mysql.createConnection({
-  host: process.env.HOST,
-  user: process.env.USER,
-  database: process.env.DATABASE,
-  password: process.env.PASSWORD,
-});
-
-// Global variables
-const FILEPATH = './data/data.json';
-
-// Function to create the JSON file
-function createJsonFile(jsonFile){
-  fs.writeFile(FILEPATH, jsonFile, (err) => {
-    if (err) throw err;
-    console.log('File has been saved !');
-  });
-}
+import { connection, FILEPATH } from './config.mjs';
+import { createJsonFile } from './jsonUtils.mjs';
 
 // Function to create the users list
 function createUsers(users){
@@ -80,12 +57,12 @@ function processData(data, users) {
 
   // Convert the data to JSON format and create the JSON file
   const jsonFile = JSON.stringify(usersList);
-  createJsonFile(jsonFile);
+  createJsonFile(jsonFile, FILEPATH);
 }
 
 
 // Exporting the data from the database to a JSON file
-export function exportData() {
+function exportData() {
 
   connection.connect();
   const userQuery = "SELECT DISTINCT Utilisateur FROM transition";
@@ -110,4 +87,7 @@ export function exportData() {
 
 
 // Calling the function
-// exportData();
+exportData();
+
+// Export the function
+// export { exportData };

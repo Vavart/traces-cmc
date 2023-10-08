@@ -1,93 +1,52 @@
-// File : evaluation.js
+// File: evaluation.mjs
 // Author: Clara D. & Maxime S.
 // Description: This file is used  to evaluate the data from the JSON file and determine the score of each user
 
 // Dependencies
-import fs from 'fs';
-
-// Global variables
-const FILEPATH = './data/data.json';
-const WEIGHTS = {
-  'connections': 1,
-  'displays': 1,
-  'posts': 1,
-  'activities': 1
-};
-
-const TITLES = Object.keys(WEIGHTS);
-
-class User {
-  constructor(name) {
-    this.name = name;
-    this.connections = 0;
-    this.displays = 0;
-    this.posts = 0;
-    this.activities = 0;
-    this.score = 0;
-    this.connectionsScore = 0;
-    this.displaysScore = 0;
-    this.postsScore = 0;
-    this.activitiesScore = 0;
-    this.score = 0;
-    this.normalizedscore = 0;
-  }
-}
-
-class Measures {
-  constructor() {
-    this.maxconnections = 0;
-    this.minconnections = 0;
-    this.maxdisplays = 0;
-    this.mindisplays = 0;
-    this.maxposts = 0;
-    this.minposts = 0;
-    this.maxactivities = 0;
-    this.minactivities = 0;
-  }
-}
-
-
-// Read the JSON file
-export async function readJSONFile(filePath) {
-  return JSON.parse(fs.readFileSync(filePath));
-}
+import { User, Connection, Display, Posts, Activity, UserStats, Measures } from './classes.mjs';
+import { FILEPATH, WEIGHTS, TITLES } from './config.mjs';
+import { readJSONFile } from './jsonUtils.mjs';
 
 // Filter the data according to a start date and an end date
-function getData(data, start, end) {
+function getDataIntoDates(data, usersList, dateStart, dateEnd) {
   let filteredData = [];
   data.forEach(row => {
+
+    filteredData.push(new User(row.name));
+    console.log(row.name);
+    
     row.connections.forEach(connection => {
       const parsedDate = new Date(connection.date);
-      if (parsedDate >= new Date(start) && parsedDate <= new Date(end)) {
-        filteredData.push(row);
+      if (parsedDate >= dateStart && parsedDate <= dateEnd) {
+        filteredData[usersList.indexOf(row.name)].connections.push(connection);
       }
     });
-
-
+  
     row.displays.forEach(display => {
       const parsedDate = new Date(display.date);
-      if (parsedDate >= new Date(start) && parsedDate <= new Date(end)) {
-        filteredData.push(row);
+      if (parsedDate >= dateStart && parsedDate <= dateEnd) {
+        filteredData[usersList.indexOf(row.name)].displays.push(display);
       }
-    });
-
-    row.posts.forEach(post => {
-      const parsedDate = new Date(post.date);
-      if (parsedDate >= new Date(start) && parsedDate <= new Date(end)) {
-        filteredData.push(row);
-      }
-    });
-
-    row.activities.forEach(activity => { 
-      const parsedDate = new Date(activity.date);
-      if (parsedDate >= new Date(start) && parsedDate <= new Date(end)) {
-        filteredData.push(row);
-      }
-    });
-
+      });
+      
+      row.posts.forEach(post => {
+          const parsedDate = new Date(post.date);
+          if (parsedDate >= dateStart && parsedDate <= dateEnd) {
+              filteredData[usersList.indexOf(row.name)].posts.push(post);
+            }
+          });
+          
+      row.activities.forEach(activity => { 
+        const parsedDate = new Date(activity.date);
+        if (parsedDate >= dateStart && parsedDate <= dateEnd) {
+            filteredData[usersList.indexOf(row.name)].activities.push(activity);
+        }
+      });     
   })
-}
 
+  return filteredData;
+}
+  
 function createUsersList(data) {
   return data.map(row => row.name);
 }
@@ -96,7 +55,7 @@ function createUsersList(data) {
 function createUsersActions(usersList) {
   let usersActions = [];
   usersList.forEach(name => {
-    usersActions.push(new User(name));
+    usersActions.push(new UserStats(name));
   });
 
   return usersActions;
@@ -209,22 +168,16 @@ function getAllScores(usersNormalizedScores) {
   return scores;
 }
 
-const data = await readJSONFile(FILEPATH);
+const data = readJSONFile(FILEPATH);
 const usersList = createUsersList(data);
 const usersActions = createUsersActions(usersList);
 const usersMeasures = countActions(data, usersActions);
 const measures = getMinAndMaxOfAllData(usersMeasures);
 const usersScores = evaluateScore(usersMeasures, measures);
-// console.log(usersScores[0]);
-// console.log(measures);
 const usersTotalScores = evaluateTotalScore(usersScores);
 const [scoreMin, scoreMax] = getMinAndMaxScoreOfUser(usersTotalScores);
 const usersNormalizedScores = normalizeScore(usersTotalScores, scoreMin, scoreMax);
 const scores = getAllScores(usersNormalizedScores);
-// console.log(scores);
-// console.log(usersActions[usersList.indexOf("madeth")]); // mauvais un peu
 
-
-const newData = getData(data, '2009-01-01', '2019-01-31');
-
-const date = data[0].connections[0].date
+const newData = getDataIntoDates(data, usersList, new Date('2009-03-17'), new Date('2019-01-31'));
+console.log(newData);

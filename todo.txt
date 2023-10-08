@@ -1,13 +1,2 @@
-
-
-- evaluation
-- interface
-
-nice to have : 
-- décomposer en fichiers séparés (genre un dossier models, scripts etc...)
-- mettre les variables globales dans un fichier séparé (genre un fichier config.js)
-
-
----
 côté navigateur on peut pas utiliser fs en js du coup il faudrait écrire les indicateurs dans un fichiers pour les utiliser de manière statique
 problème avec l'affichage dynamique alors
