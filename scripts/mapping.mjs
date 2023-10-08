@@ -3,9 +3,13 @@
 // Description: This file is used to export the data from the database to a JSON file
 
 // Dependencies (npm install)
-const mysql = require('mysql');
-const fs = require('fs');
-require('dotenv').config();
+import mysql from 'mysql';
+import fs from 'fs';
+import { config } from 'dotenv';
+import { User, Connection, Display, Posts, Activity } from './classes.mjs';
+
+config();
+console.log("Hello from mapping.js");
 
 // Connection to the database (using .env file)
 const connection = mysql.createConnection({
@@ -18,58 +22,6 @@ const connection = mysql.createConnection({
 // Global variables
 const FILEPATH = './data/data.json';
 
-
-// Classes
-class User{
-  constructor(name){
-    this.name = name
-    this.connections = []
-    this.displays = []
-    this.posts = []
-    this.activities = []
-  }
-}
-
-class Connection{
-  constructor(date, time, delay, comment){
-    this.date = date
-    this.heure = time
-    this.delai = delay
-    this.comment = comment
-  }
-}
-
-class Display{
-  constructor(type, idForum, date, time, delay, comment){
-    this.type = type
-    this.idForum = idForum
-    this.date = date
-    this.heure = time
-    this.delai = delay
-    this.comment = comment
-  }
-}
-
-class Posts{
-  constructor(type, idForum, date, time, delay, comment){
-    this.type = type
-    this.idForum = idForum
-    this.date = date
-    this.heure = time
-    this.delai = delay
-    this.comment = comment
-  }
-}
-
-class Activity { 
-  constructor(type, date, time){
-    this.type = type
-    this.date = date
-    this.heure = time
-  }
-}
-
-
 // Function to create the JSON file
 function createJsonFile(jsonFile){
   fs.writeFile(FILEPATH, jsonFile, (err) => {
@@ -77,7 +29,6 @@ function createJsonFile(jsonFile){
     console.log('File has been saved !');
   });
 }
-
 
 // Function to create the users list
 function createUsers(users){
@@ -92,11 +43,11 @@ function createUsers(users){
 // Function to process the data from the database
 function processData(data, users) {
 
-  usersList = createUsers(users);
+  const usersList = createUsers(users);
 
   data.forEach(row => {
       
-    userIndex = users.indexOf(row.Utilisateur)
+    const userIndex = users.indexOf(row.Utilisateur)
 
     switch (row.Titre){
 
@@ -128,13 +79,13 @@ function processData(data, users) {
   });
 
   // Convert the data to JSON format and create the JSON file
-  jsonFile = JSON.stringify(usersList);
+  const jsonFile = JSON.stringify(usersList);
   createJsonFile(jsonFile);
 }
 
 
 // Exporting the data from the database to a JSON file
-function exportData() {
+export function exportData() {
 
   connection.connect();
   const userQuery = "SELECT DISTINCT Utilisateur FROM transition";
@@ -159,4 +110,4 @@ function exportData() {
 
 
 // Calling the function
-exportData();
+// exportData();

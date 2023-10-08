@@ -2,10 +2,8 @@
 // Author: Clara D. & Maxime S.
 // Description: This file is used  to evaluate the data from the JSON file and determine the score of each user
 
-// Dependencies (npm install)
-const { log } = require('console');
-const fs = require('fs');
-const { get } = require('http');
+// Dependencies
+import fs from 'fs';
 
 // Global variables
 const FILEPATH = './data/data.json';
@@ -50,7 +48,7 @@ class Measures {
 
 
 // Read the JSON file
-function readJSONFile(filePath) {
+export async function readJSONFile(filePath) {
   return JSON.parse(fs.readFileSync(filePath));
 }
 
@@ -58,11 +56,36 @@ function readJSONFile(filePath) {
 function getData(data, start, end) {
   let filteredData = [];
   data.forEach(row => {
-    if (row.Date >= start && row.Date <= end) {
-      filteredData.push(row);
-    }
-  });
-  return filteredData;
+    row.connections.forEach(connection => {
+      const parsedDate = new Date(connection.date);
+      if (parsedDate >= new Date(start) && parsedDate <= new Date(end)) {
+        filteredData.push(row);
+      }
+    });
+
+
+    row.displays.forEach(display => {
+      const parsedDate = new Date(display.date);
+      if (parsedDate >= new Date(start) && parsedDate <= new Date(end)) {
+        filteredData.push(row);
+      }
+    });
+
+    row.posts.forEach(post => {
+      const parsedDate = new Date(post.date);
+      if (parsedDate >= new Date(start) && parsedDate <= new Date(end)) {
+        filteredData.push(row);
+      }
+    });
+
+    row.activities.forEach(activity => { 
+      const parsedDate = new Date(activity.date);
+      if (parsedDate >= new Date(start) && parsedDate <= new Date(end)) {
+        filteredData.push(row);
+      }
+    });
+
+  })
 }
 
 function createUsersList(data) {
@@ -186,17 +209,22 @@ function getAllScores(usersNormalizedScores) {
   return scores;
 }
 
-const data = readJSONFile(FILEPATH);
+const data = await readJSONFile(FILEPATH);
 const usersList = createUsersList(data);
 const usersActions = createUsersActions(usersList);
 const usersMeasures = countActions(data, usersActions);
 const measures = getMinAndMaxOfAllData(usersMeasures);
 const usersScores = evaluateScore(usersMeasures, measures);
-console.log(usersScores[0]);
-console.log(measures);
+// console.log(usersScores[0]);
+// console.log(measures);
 const usersTotalScores = evaluateTotalScore(usersScores);
 const [scoreMin, scoreMax] = getMinAndMaxScoreOfUser(usersTotalScores);
 const usersNormalizedScores = normalizeScore(usersTotalScores, scoreMin, scoreMax);
 const scores = getAllScores(usersNormalizedScores);
 // console.log(scores);
 // console.log(usersActions[usersList.indexOf("madeth")]); // mauvais un peu
+
+
+const newData = getData(data, '2009-01-01', '2019-01-31');
+
+const date = data[0].connections[0].date
