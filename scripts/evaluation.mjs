@@ -4,7 +4,7 @@
 
 // Dependencies
 import { User, Connection, Display, Posts, Activity, UserStats, Measures } from './classes.mjs';
-import { FILEPATH, WEIGHTS, TITLES } from './config.mjs';
+import { FILEPATH, WEIGHTS, TITLES, CATEGORIES } from './config.mjs';
 import { readJSONFile } from './jsonUtils.mjs';
 
 // Filter the data according to a start date and an end date
@@ -45,6 +45,76 @@ function getDataIntoDates(data, usersList, dateStart, dateEnd) {
   })
 
   return filteredData;
+}
+
+
+function getMinAndMaxDate(data) {
+
+  let min, max;
+
+  try {
+
+    let i = 0;
+    let catIndex = 0;
+    while (data[i][CATEGORIES[catIndex]].length === 0) {
+      i++;
+  
+      if (i === data.length) {
+        catIndex++;
+        i = 0;
+        
+      }
+    }
+
+    min = new Date(data[i][CATEGORIES[catIndex]][0].date);
+    max = new Date(data[i][CATEGORIES[catIndex]][0].date);
+  }
+
+  catch(e) {
+    console.log("No data found : "  + e);
+  }
+
+
+  data.forEach(row => {
+    row.connections.forEach(connection => {
+      const parsedDate = new Date(connection.date);
+      if (parsedDate < min) {
+        min = parsedDate;
+      }
+      if (parsedDate > max) {
+        max = parsedDate;
+      }
+    });
+    row.displays.forEach(connection => {
+      const parsedDate = new Date(connection.date);
+      if (parsedDate < min) {
+        min = parsedDate;
+      }
+      if (parsedDate > max) {
+        max = parsedDate;
+      }
+    });
+    row.posts.forEach(connection => {
+      const parsedDate = new Date(connection.date);
+      if (parsedDate < min) {
+        min = parsedDate;
+      }
+      if (parsedDate > max) {
+        max = parsedDate;
+      }
+    });
+    row.activities.forEach(connection => {
+      const parsedDate = new Date(connection.date);
+      if (parsedDate < min) {
+        min = parsedDate;
+      }
+      if (parsedDate > max) {
+        max = parsedDate;
+      }
+    });
+  });
+
+  return [min, max];
 }
   
 function createUsersList(data) {
@@ -168,16 +238,22 @@ function getAllScores(usersNormalizedScores) {
   return scores;
 }
 
-const data = readJSONFile(FILEPATH);
-const usersList = createUsersList(data);
-const usersActions = createUsersActions(usersList);
-const usersMeasures = countActions(data, usersActions);
-const measures = getMinAndMaxOfAllData(usersMeasures);
-const usersScores = evaluateScore(usersMeasures, measures);
-const usersTotalScores = evaluateTotalScore(usersScores);
-const [scoreMin, scoreMax] = getMinAndMaxScoreOfUser(usersTotalScores);
-const usersNormalizedScores = normalizeScore(usersTotalScores, scoreMin, scoreMax);
-const scores = getAllScores(usersNormalizedScores);
+export { getDataIntoDates, createUsersList, createUsersActions, countActions, getMinAndMaxOfData, getMinAndMaxOfAllData, evaluateScore, evaluateTotalScore, getMinAndMaxScoreOfUser, normalizeScore, getAllScores };
 
-const newData = getDataIntoDates(data, usersList, new Date('2009-03-17'), new Date('2019-01-31'));
-console.log(newData);
+const data = readJSONFile(FILEPATH);
+// const usersList = createUsersList(data);
+// const usersActions = createUsersActions(usersList);
+// const usersMeasures = countActions(data, usersActions);
+// const measures = getMinAndMaxOfAllData(usersMeasures);
+// const usersScores = evaluateScore(usersMeasures, measures);
+// const usersTotalScores = evaluateTotalScore(usersScores);
+// const [scoreMin, scoreMax] = getMinAndMaxScoreOfUser(usersTotalScores);
+// const usersNormalizedScores = normalizeScore(usersTotalScores, scoreMin, scoreMax);
+// const scores = getAllScores(usersNormalizedScores);
+
+// const newData = getDataIntoDates(data, usersList, new Date('2009-03-17'), new Date('2019-01-31'));
+// console.log(newData);
+
+const [min, max] = getMinAndMaxDate(data);
+console.log(min);
+console.log(max);

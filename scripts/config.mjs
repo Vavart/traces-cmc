@@ -23,6 +23,8 @@ const WEIGHTS = {
   'activities': 1
 };
 
+const CATEGORIES = Object.keys(WEIGHTS);
+
 const TITLES = Object.keys(WEIGHTS);
 
-export { connection, FILEPATH, WEIGHTS, TITLES };
+export { connection, FILEPATH, WEIGHTS, TITLES, CATEGORIES };
