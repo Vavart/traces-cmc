@@ -1,2 +1,6 @@
-côté navigateur on peut pas utiliser fs en js du coup il faudrait écrire les indicateurs dans un fichiers pour les utiliser de manière statique
-problème avec l'affichage dynamique alors
+- gérer les null 
+- rework les dates pour qu'elles soient plus belles 
+- actions (par mois, année)
+- ui (styling) (détail)
+- graphique par user
+- détails (style chart etc... etc... etc...)

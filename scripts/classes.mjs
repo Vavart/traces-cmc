@@ -58,7 +58,6 @@ class User{
       this.displays = 0;
       this.posts = 0;
       this.activities = 0;
-      this.score = 0;
       this.connectionsScore = 0;
       this.displaysScore = 0;
       this.postsScore = 0;

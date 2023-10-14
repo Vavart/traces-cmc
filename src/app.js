@@ -115,7 +115,7 @@ document.addEventListener("DOMContentLoaded", () => {
     dataScores.forEach((score) => {
       score.forEach((value) => {
         const userName = Object.keys(value)[0]
-        const userScore = Object.values(value)[0] == null ? 0 : Object.values(value)[0]
+        const userScore = Object.values(value)[0] == null ? -0.0001 : Object.values(value)[0]
         const userIndex = usersDatasets.findIndex(dataset => dataset.label === userName);
         usersDatasets[userIndex].data.push(userScore)
       });
