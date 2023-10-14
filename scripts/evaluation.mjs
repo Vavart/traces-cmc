@@ -4,8 +4,7 @@
 
 // Dependencies
 import { User, Connection, Display, Posts, Activity, UserStats, Measures } from './classes.mjs';
-import { FILEPATH, WEIGHTS, TITLES, CATEGORIES } from './config.mjs';
-import { readJSONFile } from './jsonUtils.mjs';
+import { WEIGHTS, CATEGORIES } from './config.mjs';
 
 // Filter the data according to a start date and an end date
 function getDataIntoDates(data, usersList, dateStart, dateEnd) {
@@ -13,7 +12,7 @@ function getDataIntoDates(data, usersList, dateStart, dateEnd) {
   data.forEach(row => {
 
     filteredData.push(new User(row.name));
-    console.log(row.name);
+    // console.log(row.name);
     
     row.connections.forEach(connection => {
       const parsedDate = new Date(connection.date);
@@ -45,6 +44,10 @@ function getDataIntoDates(data, usersList, dateStart, dateEnd) {
   })
 
   return filteredData;
+}
+
+function getDataForDate(data,usersList, date) {
+  return getDataIntoDates(data, usersList, date, date);
 }
 
 
@@ -167,7 +170,7 @@ function getMinAndMaxOfData(usersMeasures, title) {
 // Get the minimum and maximum of all the data (connections, displays, posts, activities)
 function getMinAndMaxOfAllData(usersMeasures) {
   const measures = new Measures();
-  TITLES.forEach(title => {
+  CATEGORIES.forEach(title => {
     const [min, max] = getMinAndMaxOfData(usersMeasures, title);
     measures[`max${title}`] = max;
     measures[`min${title}`] = min;
@@ -179,8 +182,9 @@ function getMinAndMaxOfAllData(usersMeasures) {
 // Evaluate the score of each user per action (connections, displays, posts, activities)
 function evaluateScore(usersMeasures, measures) {
   usersMeasures.forEach(user => {
-    TITLES.forEach(title => {
-      user[`${title}Score`] = (user[title] - measures[`min${title}`]) / (measures[`max${title}`] - measures[`min${title}`]);
+    CATEGORIES.forEach(title => {
+      user[title] === 0 ? user[`${title}Score`] = 0 : user[`${title}Score`] = (user[title] - measures[`min${title}`]) / (measures[`max${title}`] - measures[`min${title}`]);
+      // user[`${title}Score`] = (user[title] - measures[`min${title}`]) / (measures[`max${title}`] - measures[`min${title}`]);
     });
   });
 
@@ -191,7 +195,7 @@ function evaluateScore(usersMeasures, measures) {
 function evaluateTotalScore(usersScores) {
   usersScores.forEach(user => {
     user.score = 0;
-    TITLES.forEach(title => {
+    CATEGORIES.forEach(title => {
       user.score += user[`${title}Score`] * WEIGHTS[title];
     });
   });
@@ -238,22 +242,5 @@ function getAllScores(usersNormalizedScores) {
   return scores;
 }
 
-export { getDataIntoDates, createUsersList, createUsersActions, countActions, getMinAndMaxOfData, getMinAndMaxOfAllData, evaluateScore, evaluateTotalScore, getMinAndMaxScoreOfUser, normalizeScore, getAllScores };
+export { getDataIntoDates, getDataForDate, getMinAndMaxDate, createUsersList, createUsersActions, countActions, getMinAndMaxOfData, getMinAndMaxOfAllData, evaluateScore, evaluateTotalScore, getMinAndMaxScoreOfUser, normalizeScore, getAllScores };
 
-const data = readJSONFile(FILEPATH);
-// const usersList = createUsersList(data);
-// const usersActions = createUsersActions(usersList);
-// const usersMeasures = countActions(data, usersActions);
-// const measures = getMinAndMaxOfAllData(usersMeasures);
-// const usersScores = evaluateScore(usersMeasures, measures);
-// const usersTotalScores = evaluateTotalScore(usersScores);
-// const [scoreMin, scoreMax] = getMinAndMaxScoreOfUser(usersTotalScores);
-// const usersNormalizedScores = normalizeScore(usersTotalScores, scoreMin, scoreMax);
-// const scores = getAllScores(usersNormalizedScores);
-
-// const newData = getDataIntoDates(data, usersList, new Date('2009-03-17'), new Date('2019-01-31'));
-// console.log(newData);
-
-const [min, max] = getMinAndMaxDate(data);
-console.log(min);
-console.log(max);

@@ -81,4 +81,11 @@ class User{
     }
   }
 
-export {User, Connection, Display, Posts, Activity, UserStats, Measures}
+class Indicator {
+  constructor(date, dataArr) {
+    this.date = date;
+    this.data = dataArr;
+  }
+}
+
+export {User, Connection, Display, Posts, Activity, UserStats, Measures, Indicator}

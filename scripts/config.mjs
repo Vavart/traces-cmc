@@ -15,7 +15,8 @@ const connection = mysql.createConnection({
   password: process.env.PASSWORD,
 });
 
-const FILEPATH = './data/data.json';
+const DATAPATH = './data/data.json';
+const INDICATORSPATH = './data/indicators.json';
 const WEIGHTS = {
   'connections': 1,
   'displays': 1,
@@ -25,6 +26,4 @@ const WEIGHTS = {
 
 const CATEGORIES = Object.keys(WEIGHTS);
 
-const TITLES = Object.keys(WEIGHTS);
-
-export { connection, FILEPATH, WEIGHTS, TITLES, CATEGORIES };
+export { connection, DATAPATH, INDICATORSPATH, WEIGHTS, CATEGORIES };
