@@ -22,6 +22,7 @@ function generateIndicators(data) {
     const usersList = evalFuncs.createUsersList(data);
 
     let i = 0;
+    let dateIn7Days = currDate;
     
     while (currDate <= maxDate) {
 
@@ -29,7 +30,10 @@ function generateIndicators(data) {
         indicatorsData.push(new Indicator(new Date(currDate), []));
         
         // Get the data for the current date
-        const currData = evalFuncs.getDataForDate(data, usersList, currDate);
+        // const currData = evalFuncs.getDataForDate(data, usersList, currDate);
+        dateIn7Days.setDate(currDate.getDate() + 6);
+        const currData = evalFuncs.getDataIntoDates(data, usersList, currDate, dateIn7Days);
+
         const usersActions = evalFuncs.createUsersActions(usersList);
 
         // Compute score for currData
@@ -43,7 +47,7 @@ function generateIndicators(data) {
 
         indicatorsData[i].data = scores;
         i++;
-        currDate.setDate(currDate.getDate() + 1);
+        currDate.setDate(dateIn7Days.getDate() + 1);
 
     }
 
