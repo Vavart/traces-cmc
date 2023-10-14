@@ -1,13 +1,3 @@
-/*
-
-Construire la liste des indicateurs à partir des fonctions evaluation.mjs
-1. Créer un fichier .json par jour (genre { date : [score1, score2, score3, ...] etc... }) pour chartjs
-2. Créer des fonctions pour prendre les mois 
-3. Créer un bouton (action) par mois ? Est-ce que ça fera trop ?
-4. Voir pour peut-être le faire autrement ? (pas de bouton, mais un menu déroulant ? pour les années au moins ?)
-
-*/
-
 // File: getIndicators.mjs
 // Author: Clara D. & Maxime S.
 // Description: Get the indicators from the data and write them in a JSON file
@@ -26,7 +16,7 @@ function generateIndicators(data) {
 
     // Get min and max date from the data
     const [minDate, maxDate] = evalFuncs.getMinAndMaxDate(data);
-    const currDate = minDate;
+    let currDate = minDate;
 
     // Create the list of users and their actions
     const usersList = evalFuncs.createUsersList(data);
@@ -35,7 +25,8 @@ function generateIndicators(data) {
     
     while (currDate <= maxDate) {
 
-        indicatorsData.push(new Indicator(currDate, []));
+        console.log("Reading : " + currDate);
+        indicatorsData.push(new Indicator(new Date(currDate), []));
         
         // Get the data for the current date
         const currData = evalFuncs.getDataForDate(data, usersList, currDate);
@@ -50,8 +41,10 @@ function generateIndicators(data) {
         const usersNormalizedScores = evalFuncs.normalizeScore(usersTotalScores, scoreMin, scoreMax);
         const scores = evalFuncs.getAllScores(usersNormalizedScores);
 
-        indicatorsData[i++].data = scores;
+        indicatorsData[i].data = scores;
+        i++;
         currDate.setDate(currDate.getDate() + 1);
+
     }
 
     const jsonFile = JSON.stringify(indicatorsData);
@@ -59,4 +52,4 @@ function generateIndicators(data) {
 }
 
 const data = readJSONFile(DATAPATH);
-// generateIndicators(data);
+generateIndicators(data);
