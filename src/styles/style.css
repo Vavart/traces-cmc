@@ -16,6 +16,7 @@ body {
     background-color: var(--primary-color);
     color: var(--white);
     margin: 20px 40px;
+    font-family: Comfortaa, sans-serif;
 }
 
 .title {
@@ -62,6 +63,8 @@ body {
     color: var(--white);
     cursor: pointer;
     min-width: 50px;
+    font-size: 0.75rem;
+    font-family: Comfortaa, sans-serif;
 }
 
 .chart-action:hover {

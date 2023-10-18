@@ -3,7 +3,7 @@
 // Description: Display the chart into the web page
 
 // Utils
-const DATAPATH = "/data/indicators.json";
+const DATAPATH = "../data/indicators.json";
 const usersColors = ["#FF5733", "#44A2B9", "#E59400", "#008C45", "#7D3C98", "#0094E0", "#FF6F61", "#2E3192", "#FFAA00", "#00A885", "#A020F0", "#00A9A5", "#F472D0", "#00B0F0", "#FFC400", "#60A917", "#FFAC2E", "#218380", "#FF58B6", "#0353A4", "#FF4255", "#00A699", "#AB83A1"]
 const months = {
   1: "January",
@@ -93,6 +93,7 @@ document.addEventListener("DOMContentLoaded", () => {
   .then (data => {
 
     allData = data; 
+    console.log(allData.length);
 
     // Update the chart config
     config.data.labels = getUserLabels(data)
@@ -155,7 +156,6 @@ for (const year of years) {
   for (let monthNumber = 1; monthNumber <= 12; monthNumber++) {
     actions.push({
       name: `${months[monthNumber]} ${year}`,
-      isDataAvailable: separateDataByMonthsAndYear(allData, monthNumber, year).length > 0,
       handler(chart) {
         const newData = separateDataByMonthsAndYear(allData, monthNumber, year);
         console.log(newData.length);

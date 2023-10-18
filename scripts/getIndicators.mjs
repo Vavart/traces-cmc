@@ -16,24 +16,20 @@ function generateIndicators(data) {
 
     // Get min and max date from the data
     const [minDate, maxDate] = evalFuncs.getMinAndMaxDate(data);
-    let currDate = minDate;
+    let currDate = new Date(minDate);
 
     // Create the list of users and their actions
     const usersList = evalFuncs.createUsersList(data);
 
     let i = 0;
-    let dateIn7Days = new Date(currDate);
-    
-    while (currDate <= maxDate) {
+
+    for (let currDate = minDate; currDate <= maxDate; currDate.setDate(currDate.getDate() + 7)) {
 
         console.log("Reading : " + currDate);
         indicatorsData.push(new Indicator(new Date(currDate), []));
         
         // Get the data for the current date
-        // const currData = evalFuncs.getDataForDate(data, usersList, currDate);
-        dateIn7Days.setDate(currDate.getDate() + 6);
-        const currData = evalFuncs.getDataIntoDates(data, usersList, currDate, dateIn7Days);
-
+        const currData = evalFuncs.getDataIntoDates(data, usersList, new Date(currDate), new Date(currDate.getDate() + 7));
         const usersActions = evalFuncs.createUsersActions(usersList);
 
         // Compute score for currData
@@ -47,9 +43,16 @@ function generateIndicators(data) {
 
         indicatorsData[i].data = scores;
         i++;
-        currDate.setDate(dateIn7Days.getDate() + 1);
+
+        // // Go to the next week
+        // currDate.setDate(currDate.getDate() + 7);
 
     }
+    
+    // while (currDate <= maxDate) {
+        
+        
+    // }
 
     const jsonFile = JSON.stringify(indicatorsData);
     createJsonFile(jsonFile, INDICATORSPATH);
