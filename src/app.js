@@ -5,6 +5,20 @@
 // Utils
 const DATAPATH = "/data/indicators.json";
 const usersColors = ["#FF5733", "#44A2B9", "#E59400", "#008C45", "#7D3C98", "#0094E0", "#FF6F61", "#2E3192", "#FFAA00", "#00A885", "#A020F0", "#00A9A5", "#F472D0", "#00B0F0", "#FFC400", "#60A917", "#FFAC2E", "#218380", "#FF58B6", "#0353A4", "#FF4255", "#00A699", "#AB83A1"]
+const months = {
+  1: "January",
+  2: "February",
+  3: "March",
+  4: "April",
+  5: "May",
+  6: "June",
+  7: "July",
+  8: "August",
+  9: "September",
+  10: "October",
+  11: "November",
+  12: "December"
+};
 let allData = [];
 
 class UserDataset {
@@ -15,29 +29,78 @@ class UserDataset {
   }
 }
 
-// TODO : créer une fonction pour créer un dataset à partir d'une fréquence (de manière générale)
-// à refaire
-function dateSorter(data, frequency="day") {
+// Creating the datasets for the chart (one dataset per user, with the user's name as label and a random color)
+function getUserDatasets(data) {
 
-  // const newData = [];
+  const dataScores = data.map(indicator => indicator.data);
+  const users = getUsers(data[0].data)
+  const usersDatasets = []
 
-  // data.forEach(day => {
-  //   const newDay = {
-  //     date: day.date,
-  //     data: []
-  //   }
+  for (let i = 0; i < users.length; i++) {
+    usersDatasets.push(new UserDataset(users[i], usersColors[i]))
+  }
 
-  //   day.data.forEach(user => {
-  //     const newUser = {}
-  //     newUser[Object.keys(user)[0]] = Object.values(user)[0] == null ? -0.0001 : Object.values(user)[0]
-  //     newDay.data.push(newUser)
-  //   })
 
-  //   newData.push(newDay)
-  // })
+  dataScores.forEach((score) => {
+    score.forEach((value) => {
+      const userName = Object.keys(value)[0]
+      const userScore = Object.values(value)[0] == null ? -0.0001 : Object.values(value)[0]
+      const userIndex = usersDatasets.findIndex(dataset => dataset.label === userName);
+      usersDatasets[userIndex].data.push(userScore)
+    });
+  });
 
-  // return newData;
+  return usersDatasets;
+
 }
+
+function getUserLabels(data) {
+  return data.map(indicator => new Date(indicator.date).getDate() + "/" + (new Date(indicator.date).getMonth() + 1) + "/" + new Date(indicator.date).getFullYear());
+}
+
+function separateDataByMonthsAndYear(data, month, year) {
+  const newData = [];
+
+  data.forEach(day => {
+    const dayDate = new Date(day.date);
+    if (dayDate.getMonth() + 1 === month && dayDate.getFullYear() === year) {
+      newData.push(day);
+    }
+  });
+
+  // Sort the data by date
+  console.log(newData);
+
+  return newData;
+}
+
+
+
+// Get the user names of the data
+function getUsers(data) {
+  const users = []
+  data.forEach(user => {
+    users.push(Object.keys(user)[0])
+  }) 
+
+  return users
+}
+
+// Get data onLoad
+document.addEventListener("DOMContentLoaded", () => {
+  fetch(DATAPATH)
+  .then (response => response.json())
+  .then (data => {
+
+    allData = data; 
+
+    // Update the chart config
+    config.data.labels = getUserLabels(data)
+    config.data.datasets = getUserDatasets(data);
+    myChart.update();
+
+  })
+});
 
 // Chart config
 let config = {
@@ -84,68 +147,56 @@ let config = {
   },
 }
 
-// Get the user names of the data
-function getUsers(data) {
-  const users = []
-  data.forEach(user => {
-    users.push(Object.keys(user)[0])
-  }) 
+// Add actions to the chart (buttons)
+const actions = [];
+const years = [2009, 2010];
 
-  return users
+for (const year of years) {
+  for (let monthNumber = 1; monthNumber <= 12; monthNumber++) {
+    actions.push({
+      name: `${months[monthNumber]} ${year}`,
+      isDataAvailable: separateDataByMonthsAndYear(allData, monthNumber, year).length > 0,
+      handler(chart) {
+        const newData = separateDataByMonthsAndYear(allData, monthNumber, year);
+        console.log(newData.length);
+        if (newData.length === 0) {
+            alert(`No data for ${months[monthNumber]} ${year}`);
+            return;
+          }
+        chart.data.labels = getUserLabels(newData)
+        chart.data.datasets = getUserDatasets(newData);
+        chart.update();
+      }
+    });
+  }
 }
 
-// Get data onLoad
-document.addEventListener("DOMContentLoaded", () => {
-  fetch(DATAPATH)
-  .then (response => response.json())
-  .then (data => {
-
-    allData = data;
-    // console.log(data);
-
-    // Creating the datasets for the chart (one dataset per user, with the user's name as label and a random color)
-    const dataScores = data.map(indicator => indicator.data);
-    const users = getUsers(data[0].data)
-    const usersDatasets = []
-
-    for (let i = 0; i < users.length; i++) {
-      usersDatasets.push(new UserDataset(users[i], usersColors[i]))
-    }
-
-    dataScores.forEach((score) => {
-      score.forEach((value) => {
-        const userName = Object.keys(value)[0]
-        const userScore = Object.values(value)[0] == null ? -0.0001 : Object.values(value)[0]
-        const userIndex = usersDatasets.findIndex(dataset => dataset.label === userName);
-        usersDatasets[userIndex].data.push(userScore)
-      });
-    });
-
-    // Update the chart config
-    config.data.labels = data.map(indicator => new Date(indicator.date).getDate() + "/" + (new Date(indicator.date).getMonth() + 1) + "/" + new Date(indicator.date).getFullYear()),
-    config.data.datasets = usersDatasets;
-    myChart.update();
-
-  })
+actions.push({
+  name: "All",
+  handler(chart) {
+    chart.data.datasets = getUserDatasets(allData);
+    chart.data.labels = getUserLabels(allData)
+    chart.update();
+  }
 });
 
+function removeHoverClass() {
+  const buttons = document.querySelectorAll('.chart-action');
+  buttons.forEach(button => {
+    button.classList.remove('active');
+  })
+}
 
-// Add actions to the chart (buttons)
-const actions = [
-  {
-    name: 'Nullify',
-    handler(chart) {
-      chart.data.datasets = [],
-      chart.update();
-    }
-  },
-];
 
 actions.forEach(action => {
   const button = document.createElement('button');
   button.classList.add('chart-action');
   button.innerText = action.name;
-  button.addEventListener('click', () => action.handler(myChart));
+  button.addEventListener('click', () => {
+    removeHoverClass();
+    button.classList.add('active');
+    action.handler(myChart)
+  });
   document.querySelector('.chart-actions').appendChild(button);
 })
 
