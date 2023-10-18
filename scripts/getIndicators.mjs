@@ -22,7 +22,7 @@ function generateIndicators(data) {
     const usersList = evalFuncs.createUsersList(data);
 
     let i = 0;
-    let dateIn7Days = currDate;
+    let dateIn7Days = new Date(currDate);
     
     while (currDate <= maxDate) {
 

@@ -1,6 +1,3 @@
-- gérer les null 
-- rework les dates pour qu'elles soient plus belles 
 - actions (par mois, année)
 - ui (styling) (détail)
-- graphique par user
 - détails (style chart etc... etc... etc...)
