@@ -44,7 +44,8 @@ function getUserDatasets(data) {
   dataScores.forEach((score) => {
     score.forEach((value) => {
       const userName = Object.keys(value)[0]
-      const userScore = Object.values(value)[0] == null ? -0.0001 : Object.values(value)[0]
+      // const userScore = Object.values(value)[0] == null ? 0 : Object.values(value)[0]
+      const userScore = Object.values(value)[0]
       const userIndex = usersDatasets.findIndex(dataset => dataset.label === userName);
       usersDatasets[userIndex].data.push(userScore)
     });
@@ -68,12 +69,29 @@ function separateDataByMonthsAndYear(data, month, year) {
     }
   });
 
-  // Sort the data by date
-  console.log(newData);
-
   return newData;
 }
 
+function isDataNull(data) {
+  let isNull = true;
+  data.forEach(user => {
+    user.data.forEach(score => {
+      if (Object.values(score)[0] != null) {
+        isNull = false;
+      }
+    })
+  });
+
+  return isNull;
+}
+
+function getMinAndMaxDate(data) {
+  const dates = data.map(day => new Date(day.date));
+  const minDate = new Date(Math.min.apply(null, dates));
+  const maxDate = new Date(Math.max.apply(null, dates));
+
+  return [minDate, maxDate];
+}
 
 
 // Get the user names of the data
@@ -93,11 +111,11 @@ document.addEventListener("DOMContentLoaded", () => {
   .then (data => {
 
     allData = data; 
-    console.log(allData.length);
 
     // Update the chart config
     config.data.labels = getUserLabels(data)
     config.data.datasets = getUserDatasets(data);
+    createChartActions();
     myChart.update();
 
   })
@@ -148,37 +166,56 @@ let config = {
   },
 }
 
-// Add actions to the chart (buttons)
-const actions = [];
-const years = [2009, 2010];
+function createChartActions() {
+  // Add actions to the chart (buttons)
+  const actions = [];
+  const years = [2009, 2010];
 
-for (const year of years) {
-  for (let monthNumber = 1; monthNumber <= 12; monthNumber++) {
-    actions.push({
-      name: `${months[monthNumber]} ${year}`,
-      handler(chart) {
-        const newData = separateDataByMonthsAndYear(allData, monthNumber, year);
-        console.log(newData.length);
-        if (newData.length === 0) {
-            alert(`No data for ${months[monthNumber]} ${year}`);
-            return;
-          }
-        chart.data.labels = getUserLabels(newData)
-        chart.data.datasets = getUserDatasets(newData);
-        chart.update();
+  const [minDate, maxDate] = getMinAndMaxDate(allData);
+
+  for (const year of years) {
+    for (let monthNumber = 1; monthNumber <= 12; monthNumber++) {
+
+      if (new Date(year, monthNumber , 1) <= minDate || new Date(year, monthNumber - 1, 1) >= maxDate) {
+        continue;
       }
-    });
+
+      const newData = separateDataByMonthsAndYear(allData, monthNumber, year);
+      actions.push({
+        name: `${months[monthNumber]} ${year}`,
+        isDataNull: isDataNull(newData),
+        handler(chart) {
+          const newData = separateDataByMonthsAndYear(allData, monthNumber, year);
+          chart.data.labels = getUserLabels(newData)
+          chart.data.datasets = getUserDatasets(newData);
+          chart.update();
+        }
+      });
+    }
   }
+
+  actions.push({
+    name: "All",
+    handler(chart) {
+      chart.data.datasets = getUserDatasets(allData);
+      chart.data.labels = getUserLabels(allData)
+      chart.update();
+    }
+  });
+
+  actions.forEach(action => {
+    const button = document.createElement('button');
+    button.classList.add('chart-action');
+    button.innerText = action.name;
+    button.addEventListener('click', () => {
+      removeHoverClass();
+      button.classList.add('active');
+      action.handler(myChart)
+    });
+    document.querySelector('.chart-actions').appendChild(button);
+  })
 }
 
-actions.push({
-  name: "All",
-  handler(chart) {
-    chart.data.datasets = getUserDatasets(allData);
-    chart.data.labels = getUserLabels(allData)
-    chart.update();
-  }
-});
 
 function removeHoverClass() {
   const buttons = document.querySelectorAll('.chart-action');
@@ -187,18 +224,6 @@ function removeHoverClass() {
   })
 }
 
-
-actions.forEach(action => {
-  const button = document.createElement('button');
-  button.classList.add('chart-action');
-  button.innerText = action.name;
-  button.addEventListener('click', () => {
-    removeHoverClass();
-    button.classList.add('active');
-    action.handler(myChart)
-  });
-  document.querySelector('.chart-actions').appendChild(button);
-})
 
 // Create the chart
 const ctx = document.getElementById('myChart');
