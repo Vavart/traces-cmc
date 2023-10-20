@@ -1,6 +1,6 @@
 // File: evaluation.mjs
 // Author: Clara D. & Maxime S.
-// Description: This file is used  to evaluate the data from the JSON file and determine the score of each user
+// Description: Utils to evaluate the data from the JSON file and determine the score of each user
 
 // Dependencies
 import { User, Connection, Display, Posts, Activity, UserStats, Measures } from './classes.mjs';

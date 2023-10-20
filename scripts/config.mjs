@@ -1,6 +1,6 @@
 // File: config.mjs
 // Author: Clara D. & Maxime S.
-// Description: Classes to create the objects used in the mapping and evaluation scripts
+// Description: Configuration file for the scripts
 
 // Dependencies
 import mysql from 'mysql';

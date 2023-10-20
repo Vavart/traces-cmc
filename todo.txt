@@ -1,3 +1,0 @@
-- actions (par mois, année)
-- ui (styling) (détail)
-- détails (style chart etc... etc... etc...)

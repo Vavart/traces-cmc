@@ -1,4 +1,4 @@
-// File: app.jjs
+// File: app.js
 // Author: Clara D. & Maxime S.
 // Description: Display the chart into the web page
 
